@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webkube
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webkube
+  template:
+    metadata:
+      labels:
+        app: webkube
+    spec:
+      initContainers:
+      - name: init-content
+        image: acrpractica2.azurecr.io/webkube:practica2
+        imagePullPolicy: Always
+        command: ["/bin/sh", "-c"]
+        args: ["mkdir -p /mnt/data && if [ -d /usr/share/nginx/html/images ]; then cp -a /usr/share/nginx/html/images/. /mnt/data/; fi"]
+        volumeMounts:
+        - name: app-volume
+          mountPath: /mnt/data
+
+      containers:
+      - name: webkube
+        image: acrpractica2.azurecr.io/webkube:practica2
+        volumeMounts:
+        - mountPath: /usr/share/nginx/html/images
+          name: app-volume
+        ports:
+        - containerPort: 443
+      volumes:
+      - name: app-volume
+        persistentVolumeClaim:
+          claimName: webkube-pvc
+      imagePullSecrets:
+        - name: acr-secret

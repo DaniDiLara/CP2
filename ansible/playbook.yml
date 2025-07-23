@@ -1,0 +1,22 @@
+- name: Subir imagenes a acr
+  hosts: localhost
+  vars_files:
+    - secrets.yml
+  roles:
+    - acr
+
+- name: Despliegue con Podman vm
+  hosts: vm
+  become: true
+  vars_files:
+    - secrets.yml
+  roles:
+    - vm
+
+- name: Desplegar aplicacion en aks
+  hosts: localhost
+  vars_files:
+    - secrets.yml
+  roles:
+    - aks
+

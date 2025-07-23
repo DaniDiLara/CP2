@@ -1,0 +1,36 @@
+- name: Crear namespace
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: webkube
+
+- name: Crear secret para acr
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Secret
+      metadata:
+        name: acr-secret
+        namespace: webkube
+      type: kubernetes.io/dockerconfigjson
+      data:
+        .dockerconfigjson: "{{ dockerconfigjson_b64 }}"
+
+- name: Crear volumen
+  kubernetes.core.k8s:
+    definition: "{{ lookup('file', 'pvc.yml') | from_yaml }}"
+    namespace: webkube
+
+- name: Desplegar aplicacion
+  kubernetes.core.k8s:
+    definition: "{{ lookup('file', 'deployment.yml') | from_yaml }}"
+    namespace: webkube
+
+- name: Crear Servicio
+  kubernetes.core.k8s:
+    definition: "{{ lookup('file', 'service.yml') | from_yaml }}"
+    namespace: webkube

@@ -1,0 +1,20 @@
+- name: Entrar en acr
+  containers.podman.podman_login:
+    registry: acrpractica2.azurecr.io
+    username: "{{ acr_username }}"
+    password: "{{ acr_password }}"
+
+- name: Subir contenedor para vm
+  containers.podman.podman_image:
+    name: acrpractica2.azurecr.io/web
+    tag: practica2
+    path: ../containerd/web
+    push: true
+
+- name: Subir contenedor para kubernetes
+  containers.podman.podman_image:
+    name: acrpractica2.azurecr.io/webkube
+    tag: practica2
+    path: ../containerd/webkube
+    push: true
+    force: true

@@ -1,0 +1,5 @@
+[vm]
+51.137.206.147 ansible_user=azureuser ansible_ssh_private_key_file=/home/dani/.ssh/id_rsa_vm
+
+[all:vars]
+dockerconfigjson_b64={{ lookup('file', 'dockerconfig.json') | b64encode }}

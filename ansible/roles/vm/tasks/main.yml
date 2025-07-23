@@ -1,0 +1,75 @@
+- name: Instalar dependencias
+  apt:
+    name:
+      - software-properties-common
+      - uidmap
+    state: present
+    update_cache: true
+
+- name: Añadir clave GPG
+  ansible.builtin.apt_key:
+    url: https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_20.04/Release.key
+    state: present
+
+- name: Añadir repositorio
+  ansible.builtin.apt_repository:
+    repo: deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_20.04/ /
+    state: present
+
+- name: Actualizar apt
+  ansible.builtin.apt:
+    update_cache: yes
+
+- name: Instalar Podman
+  apt:
+    name: podman
+    state: present
+
+- name: Entrar en acr
+  containers.podman.podman_login:
+    registry: acrpractica2.azurecr.io
+    username: "{{ acr_username }}"
+    password: "{{ acr_password }}"
+  become: true
+  become_user: root
+    
+- name: Descargar la imagen
+  containers.podman.podman_image:
+    name: acrpractica2.azurecr.io/web:practica2
+  become: true
+  become_user: root
+
+- name: Lanzar contenedor
+  containers.podman.podman_container:
+    name: web
+    image: acrpractica2.azurecr.io/web:practica2
+    state: started
+    ports:
+      - "443:443"
+    restart_policy: always
+  become: true
+  become_user: root
+
+- name: Generar unidad systemd para el contenedor
+  containers.podman.podman_generate_systemd:
+    name: web
+    restart_policy: always
+    use_names: true
+    dest: /etc/systemd/system
+  become: true
+  become_user: root
+
+- name: Recargar systemd
+  systemd:
+    daemon_reload: yes
+  become: true
+  become_user: root
+
+- name: Habilitar y arrancar el contenedor
+  systemd:
+    name: container-web.service
+    enabled: yes
+    state: started
+  become: true
+  become_user: root
+
