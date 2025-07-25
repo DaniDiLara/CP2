@@ -14,19 +14,19 @@ spec:
     spec:
       initContainers:
       - name: init-content
-        image: acrpractica2.azurecr.io/webkube:practica2
+        image: acrpractica2.azurecr.io/webkube:conproxy
         imagePullPolicy: Always
         command: ["/bin/sh", "-c"]
-        args: ["mkdir -p /mnt/data && if [ -d /usr/share/nginx/html/images ]; then cp -a /usr/share/nginx/html/images/. /mnt/data/; fi"]
+        args: ["mkdir -p /mnt/data && cp /usr/share/nginx/html/index.html /mnt/data/ && if [ -d /usr/share/nginx/html/images ]; then cp -a /usr/share/nginx/html/images/. /mnt/data/; fi"]
         volumeMounts:
         - name: app-volume
           mountPath: /mnt/data
 
       containers:
       - name: webkube
-        image: acrpractica2.azurecr.io/webkube:practica2
+        image: acrpractica2.azurecr.io/webkube:conproxy
         volumeMounts:
-        - mountPath: /usr/share/nginx/html/images
+        - mountPath: /usr/share/nginx/html/
           name: app-volume
         ports:
         - containerPort: 443
