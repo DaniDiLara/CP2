@@ -1,25 +1,66 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-  <title>Hello World - Nginx Docker - Demo Podman UNIR</title>
+  <title>DevOps UNIR Kubernetes</title>
   <style>
-    h1 {
-      font-weight: lighter;
-      font-family: Arial, Helvetica, sans-serif;
-    }
+    body { font-family: Arial, Helvetica, sans-serif; text-align: center; }
+    h1 { font-weight: lighter; }
+    button { padding: 10px 20px; font-size: 18px; margin: 10px; cursor: pointer; }
+    img { margin-top: 20px; width: 200px; }
   </style>
 </head>
 
 <body>
-  <h1>
-    DevOps UNIR Kubernetes
-  </h1>
+  <h1>DevOps UNIR Kubernetes</h1>
   <img src="images/kubernetes.png" alt="Kubernetes Logo" />
-</body>
 
+  <h2>Contador de animales</h2>
+
+  <button onclick="incrementar('gato')">Gato</button>
+  <span id="contador-gato">0</span>
+
+  <br><br>
+
+  <button onclick="incrementar('perro')">Perro</button>
+  <span id="contador-perro">0</span>
+
+  <p id="respuesta-backend" style="margin-top: 30px; font-style: italic;"></p>
+
+  <script>
+    const BACKEND_URL = '/api';
+
+    function actualizarContadores() {
+      fetch(`${BACKEND_URL}/contador`)
+        .then(response => {
+          if (!response.ok) throw new Error('Error en la solicitud al backend');
+          return response.json();
+        })
+        .then(data => {
+          document.getElementById('contador-gato').innerText = data.gato;
+          document.getElementById('contador-perro').innerText = data.perro;
+          document.getElementById('respuesta-backend').innerText = 'Contadores cargados correctamente.';
+        })
+        .catch(error => {
+          document.getElementById('respuesta-backend').innerText = 'Error al cargar: ' + error.message;
+        });
+    }
+
+    function incrementar(animal) {
+      fetch(`${BACKEND_URL}/contador/${animal}`, { method: 'POST' })
+        .then(response => {
+          if (!response.ok) throw new Error('No se pudo incrementar el contador');
+          return response.json();
+        })
+        .then(() => actualizarContadores())
+        .catch(error => {
+          document.getElementById('respuesta-backend').innerText = 'Error al incrementar: ' + error.message;
+        });
+    }
+
+    actualizarContadores();
+  </script>
+</body>
 </html>
 
