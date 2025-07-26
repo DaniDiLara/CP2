@@ -29,22 +29,6 @@ resource "azurerm_public_ip" "vm_ip" {
   }
 }
 
-resource "azurerm_network_interface" "vm_nic" {
-  name                = "nic-practica2"
-  location            = var.location
-  resource_group_name = var.resource_group_name
-
-  ip_configuration {
-    name                          = "ipconfig1"
-    subnet_id                     = azurerm_subnet.vm_subnet.id
-    private_ip_address_allocation = "Dynamic"
-    public_ip_address_id          = azurerm_public_ip.vm_ip.id
-  }
-
-  tags = {
-    environment = "casopractico2"
-  }
-}
 
 resource "tls_private_key" "ssh_key" {
   algorithm = "RSA"
