@@ -29,7 +29,6 @@ resource "azurerm_public_ip" "vm_ip" {
   }
 }
 
-
 resource "tls_private_key" "ssh_key" {
   algorithm = "RSA"
   rsa_bits  = 4096
